@@ -1,4 +1,7 @@
 # 2024_SystemProgramming_Server
-Type "make" to compile source code.
-The ouput will be "Server"
-Run server with "./Server <ip address>" "<portnumber>"
+## How to compile?
+- make
+- You will get an executable binary "Server"
+## How to run?
+- ./Server portnumber
+- Ex) ./Server 8080
