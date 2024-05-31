@@ -145,8 +145,8 @@ void* printMap(void* arg) {
 
 	printf("==========PRINT MAP==========\n");
     sem_wait(&mapLock);
-	for (int j = 0; j < MAP_COL; j++) {
-		for (int i = 0; i < MAP_ROW; i++) {
+	for (int i = 0; i < MAP_ROW; i++) {
+		for (int j = 0; j < MAP_COL; j++) {
             tmpItem = (dgist->map[i][j]).item;
             switch (tmpItem.status) {
                 case nothing:
