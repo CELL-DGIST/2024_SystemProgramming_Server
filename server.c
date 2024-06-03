@@ -27,6 +27,7 @@ void* handleClient(void *arg) {
 
     client_socket = client->socket;
     ClientAction cAction;
+	free(tmpDG);
 
     int row, col, valRead;
 
