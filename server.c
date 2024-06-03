@@ -326,6 +326,8 @@ int main(int argc, char *argv[]) {
 	tDG->dgist = &dgist;
 	tDG->cIndex = cIndex;
         pthread_create(&tid, NULL, handleClient, (void *)tDG);
+	pthread_create(&tid, NULL, broadcastInformation, (void *)&dgist);
+	pthread_join(tid, NULL);
     }
 
     return 0;
