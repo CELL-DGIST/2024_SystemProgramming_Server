@@ -16,15 +16,12 @@ static inline int makeRandomInt(int max, int min) {
 // Thread entry function to handle each client
 void* handleClient(void *arg) {
 
-    DGIST* dgist = (DGIST*)arg;
+	tmpDGIST* tmpDG = (tmpDGIST*)arg;
+    DGIST* dgist = tmpDG->dgist;
     client_info* client;
     int client_socket;
     pthread_t tid;
-	int pId;
-
-    // Determine which client it will handle
-    if (dgist->players[MAX_CLIENTS - 1].socket == -1) pId = 0;
-    else pId = 1; 
+	int pId = tmpDG->cIndex;
 
 	client = &(dgist->players[pId]);
 
@@ -323,8 +320,11 @@ int main(int argc, char *argv[]) {
 		}
 
 
-		printPlayer(&dgist);
-        pthread_create(&tid, NULL, handleClient, (void *)&dgist);
+	printPlayer(&dgist);
+	tmpDGIST tDG;
+	tDG.dgist = &dgist;
+	tDG.cIndex = cIndex;
+        pthread_create(&tid, NULL, handleClient, (void *)&tDG);
     }
 
     return 0;

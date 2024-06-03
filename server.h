@@ -55,6 +55,11 @@ typedef struct{
 	Node map[MAP_ROW][MAP_COL];
 } DGIST;
 
+typedef struct{
+	DGIST* dgist;
+	int cIndex;
+}tmpDGIST;
+
 //섹션2 여러분이 서버에게 주어야 하는 구조체에 대한 설명이에요.
 
 //방문한 교차점에 함정을 설치하고 싶으면 1, 그렇지 않으면 0으로 설정하면 돼요.
