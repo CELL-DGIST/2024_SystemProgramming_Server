@@ -123,8 +123,10 @@ void* broadcastInformation(void* arg) {
     sem_wait(&mapLock);
     for (int i = 0; i < MAX_CLIENTS; i++) {
         client = (dgist->players)[i];
-		client_socket = client.socket;
-		send(client_socket, dgist, sizeof(DGIST), 0);
+		if(client.socket != -1){
+			client_socket = client.socket;
+			send(client_socket, dgist, sizeof(DGIST), 0);
+		}
     }
     sem_post(&mapLock);
 
@@ -269,9 +271,14 @@ int main(int argc, char *argv[]) {
     // Start item handling thread
     pthread_create(&tid, NULL, handleItem, (void *)&dgist);
 
+	Dictionary* clientDict = create_dictionary();
+
     // Get clients
     while (1) {
         int new_socket;
+		int ipLast;
+		int cIndex;
+        client_info newClient;
 
         if ((new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen)) < 0) {
             perror("accept");
@@ -284,23 +291,31 @@ int main(int argc, char *argv[]) {
             ntohs(address.sin_port)
         );
 
-        client_info newClient;
+		ipLast = get_last_part_as_int(inet_ntoa(address.sin_addr));
+		cIndex = dictionary_get(clientDict, ipLast);
 
-        newClient.socket = new_socket;
-        newClient.address = address;
-        newClient.score = 0;
-		if(numClient == 0){
-			newClient.row = 0;
-			newClient.col = 0;
-		}
-		else{
-			newClient.row = 4;
-			newClient.col = 4;
-		}
-        newClient.bomb = INITIAL_BOMB;
-
-        dgist.players[numClient] = newClient;
-        numClient++;
+		if(cIndex != -1){ //client exist
+			dgist.players[cIndex].socket = new_socket;;
+			newClient.address = address;
+		}else{//client does not exist
+			cIndex = numClient;
+			dictionary_add(clientDict, ipLast, cIndex);
+			newClient.socket = new_socket;
+			newClient.address = address;
+			newClient.score = 0;
+			if(cIndex == 0){
+				newClient.row = 0;
+				newClient.col = 0;
+			}
+			else{
+				newClient.row = 4;
+				newClient.col = 4;
+			}
+			newClient.bomb = INITIAL_BOMB;
+			dgist.players[cIndex] = newClient;
+			numClient++;
+		} 
+		
 
 		if(numClient > MAX_CLIENTS){
             perror("MAX CLIENT EXCCEDED");
