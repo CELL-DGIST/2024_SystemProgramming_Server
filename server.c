@@ -321,10 +321,10 @@ int main(int argc, char *argv[]) {
 
 
 	printPlayer(&dgist);
-	tmpDGIST tDG;
-	tDG.dgist = &dgist;
-	tDG.cIndex = cIndex;
-        pthread_create(&tid, NULL, handleClient, (void *)&tDG);
+	tmpDGIST* tDG = (tmpDGIST*)malloc(sizeof(tmpDGIST));;
+	tDG->dgist = &dgist;
+	tDG->cIndex = cIndex;
+        pthread_create(&tid, NULL, handleClient, (void *)tDG);
     }
 
     return 0;
