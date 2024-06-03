@@ -86,7 +86,7 @@ void* handleClient(void *arg) {
     return NULL;
 }
 
-void setItem(DGIST* dPtr) {
+int setItem(DGIST* dPtr) {
 
     int row, col, score;
 
@@ -99,11 +99,17 @@ void setItem(DGIST* dPtr) {
 
     score = makeRandomInt(MAX_SCORE, 1);
 
+	if(((row-col == 0) && (row == 4 || row == 0))){
+		sem_post(&mapLock);
+		return 0;
+	} 
+
     dPtr->map[row][col].item.status = item;
     dPtr->map[row][col].item.score = score;
 
     sem_post(&mapLock);
 	printMap(dPtr);
+	return 1;
 }
 
 // Broadcast map information to all clients
@@ -191,6 +197,8 @@ int main(int argc, char *argv[]) {
     int addrlen = sizeof(address);
     pthread_t tid;
     int numClient = 0;
+	
+	srand(time(NULL));
 
 	if (argc != 2) {
         fprintf(stderr, "Usage: %s <number>\n", argv[0]);
@@ -221,9 +229,11 @@ int main(int argc, char *argv[]) {
     }
 
     // Place items in the map
-    for (int i = 0; i < INITIAL_ITEM; i++) {
-        setItem(&dgist);
-    }
+	int k = 0;
+
+	while(k < INITIAL_ITEM){
+		k += setItem(&dgist);
+	}
 
     printf("SERVER DATA INITIALIZING COMPLETE\n");
 
@@ -279,13 +289,26 @@ int main(int argc, char *argv[]) {
         newClient.socket = new_socket;
         newClient.address = address;
         newClient.score = 0;
-        newClient.row = -1;
-        newClient.col = -1;
+		if(numClient == 0){
+			newClient.row = 0;
+			newClient.col = 0;
+		}
+		else{
+			newClient.row = 4;
+			newClient.col = 4;
+		}
         newClient.bomb = INITIAL_BOMB;
 
         dgist.players[numClient] = newClient;
         numClient++;
 
+		if(numClient > MAX_CLIENTS){
+            perror("MAX CLIENT EXCCEDED");
+            exit(EXIT_FAILURE);
+		}
+
+
+		printPlayer(&dgist);
         pthread_create(&tid, NULL, handleClient, (void *)&dgist);
     }
 

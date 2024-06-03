@@ -10,7 +10,7 @@ const int MAX_SCORE = 4; // Item max score
 const int SETTING_PERIOD = 20; //Boradcast & Item generation period
 const int INITIAL_ITEM = 10; //Initial number of item
 const int INITIAL_BOMB = 4; //The number of bomb for each user
-const int SCORE_DEDUCTION = 2; //The amount of score deduction due to bomb
+const int SCORE_DEDUCTION = 8; //The amount of score deduction due to bomb
 
 //섹션1 서버가 여러분에게 주는 구조체에요.
 
@@ -73,7 +73,7 @@ typedef struct{
 //밑에 있는 함수는 서버 함수라서 신경쓰지 않아도 되어요.
 void* handleClient(void* arg);
 void* broadcastInformation(void* arg);
-void setItem(DGIST* dPtr);
+int setItem(DGIST* dPtr); //zero to be initial state
 void* printMap(void* arg); 
 void* handleItem(void* arg);
 void printPlayer(void* arg);
